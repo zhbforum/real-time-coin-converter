@@ -20,7 +20,7 @@ const Index = () => {
       );
       return response.data.rates;
     },
-    refetchInterval: 60000, // Обновляем курсы каждую минуту
+    refetchInterval: 60000,
   });
 
   useEffect(() => {
@@ -43,25 +43,33 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-center mb-6">Конвертер валют</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+      <Card className="w-full max-w-md p-8 space-y-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <div className="space-y-2 text-center">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Конвертер валют
+          </h1>
+          <p className="text-sm text-gray-500">
+            Актуальные курсы валют в реальном времени
+          </p>
+        </div>
         
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Сумма</label>
+            <label className="text-sm font-medium text-gray-700">Сумма</label>
             <Input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Введите сумму"
               min="0"
+              className="h-12 text-lg font-medium"
             />
           </div>
 
-          <div className="grid grid-cols-[1fr,auto,1fr] gap-2 items-center">
+          <div className="grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
             <Select value={fromCurrency} onValueChange={setFromCurrency}>
-              <SelectTrigger>
+              <SelectTrigger className="h-12">
                 <SelectValue placeholder="От" />
               </SelectTrigger>
               <SelectContent>
@@ -75,13 +83,13 @@ const Index = () => {
 
             <button
               onClick={handleSwapCurrencies}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-3 hover:bg-blue-50 rounded-full transition-colors duration-200"
             >
-              <ArrowLeftRight className="h-4 w-4" />
+              <ArrowLeftRight className="h-5 w-5 text-blue-600" />
             </button>
 
             <Select value={toCurrency} onValueChange={setToCurrency}>
-              <SelectTrigger>
+              <SelectTrigger className="h-12">
                 <SelectValue placeholder="В" />
               </SelectTrigger>
               <SelectContent>
@@ -94,16 +102,28 @@ const Index = () => {
             </Select>
           </div>
 
-          <div className="p-4 bg-gray-100 rounded-lg">
-            <div className="text-sm text-gray-600">Результат:</div>
-            <div className="text-2xl font-bold">
+          <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+            <div className="text-sm text-gray-600 mb-1">Результат:</div>
+            <div className="text-3xl font-bold text-gray-900">
               {isLoading ? (
-                "Загрузка..."
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                </div>
               ) : (
-                `${amount} ${fromCurrency} = ${result} ${toCurrency}`
+                <div className="flex items-baseline space-x-2">
+                  <span>{amount} {fromCurrency}</span>
+                  <span className="text-gray-400 text-xl">=</span>
+                  <span className="text-blue-600">{result} {toCurrency}</span>
+                </div>
               )}
             </div>
           </div>
+        </div>
+
+        <div className="text-center text-xs text-gray-500">
+          Курсы валют обновляются каждую минуту
         </div>
       </Card>
     </div>
