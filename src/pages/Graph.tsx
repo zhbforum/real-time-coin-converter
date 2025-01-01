@@ -1,15 +1,15 @@
 import Header from "@/components/Header";
-import EngineeringCalculator from "@/components/calculators/EngineeringCalculator";
+import GraphCalculator from "@/components/calculators/GraphCalculator";
 
-const Index = () => {
+const Graph = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
-        <EngineeringCalculator />
+        <GraphCalculator />
       </main>
     </div>
   );
 };
 
-export default Index;
+export default Graph;
