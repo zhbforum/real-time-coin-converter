@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calculator, Plus, X, Rotate, Hash } from "lucide-react";
+import { Calculator, Plus, X, RotateCcw, Hash } from "lucide-react";
 import { evaluate, matrix } from "mathjs";
 import { toast } from "sonner";
 
@@ -159,7 +159,7 @@ const MatrixCalculator = () => {
                   Умножение
                 </Button>
                 <Button onClick={() => handleOperation('transpose')} className="gap-2">
-                  <Rotate className="h-4 w-4" />
+                  <RotateCcw className="h-4 w-4" />
                   Транспонирование
                 </Button>
                 <Button onClick={() => handleOperation('determinant')} className="gap-2">
