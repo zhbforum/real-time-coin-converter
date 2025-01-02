@@ -10,7 +10,7 @@ interface GraphFunction {
 interface GraphCanvasProps {
   functions: GraphFunction[];
   scale: number;
-  setScale: (scale: number) => void;
+  setScale: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const GraphCanvas = ({ functions, scale, setScale }: GraphCanvasProps) => {
@@ -103,7 +103,7 @@ const GraphCanvas = ({ functions, scale, setScale }: GraphCanvasProps) => {
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     const delta = e.deltaY;
-    setScale(prevScale => {
+    setScale((prevScale) => {
       if (delta > 0) {
         return prevScale / 1.1; // уменьшаем масштаб
       } else {
