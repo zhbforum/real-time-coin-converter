@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calculator, Plus, X, RotateCcw, Hash } from "lucide-react";
+import { Calculator, Plus, X, RotateCcw, Hash, ArrowLeft, ArrowRight, Trash2, Share2 } from "lucide-react";
 import { evaluate, matrix } from "mathjs";
 import { toast } from "sonner";
 
@@ -14,18 +13,17 @@ const MatrixCalculator = () => {
   const [matrixA, setMatrixA] = useState<string>("");
   const [matrixB, setMatrixB] = useState<string>("");
   const [result, setResult] = useState<string>("");
-  const [rows, setRows] = useState<number>(2);
-  const [cols, setCols] = useState<number>(2);
+  const [rows, setRows] = useState<number>(3);
+  const [cols, setCols] = useState<number>(3);
+  const [showDecimals, setShowDecimals] = useState<boolean>(true);
 
   const parseMatrix = (input: string): Matrix | null => {
     try {
-      // Parse the string input into a matrix
       const cleanInput = input.trim().replace(/\s+/g, ' ');
       const rows = cleanInput.split(';').map(row => 
         row.trim().split(' ').map(Number)
       );
       
-      // Validate matrix dimensions
       const isValid = rows.every(row => row.length === rows[0].length) &&
                      !rows.flat().some(isNaN);
       
@@ -36,7 +34,10 @@ const MatrixCalculator = () => {
   };
 
   const formatMatrix = (matrix: Matrix): string => {
-    return matrix.map(row => row.join(' ')).join(';\n');
+    return matrix.map(row => 
+      row.map(val => showDecimals ? val.toString() : Math.round(val).toString())
+         .join(' ')
+    ).join(';\n');
   };
 
   const handleOperation = (operation: string) => {
@@ -45,7 +46,7 @@ const MatrixCalculator = () => {
       const mB = operation !== 'transpose' && operation !== 'determinant' ? parseMatrix(matrixB) : null;
 
       if (!mA || (operation !== 'transpose' && operation !== 'determinant' && !mB)) {
-        toast.error("Неверный формат матрицы. Используйте пробелы между числами и ; между строками");
+        toast.error("Неверный формат матрицы");
         return;
       }
 
@@ -53,6 +54,9 @@ const MatrixCalculator = () => {
       switch (operation) {
         case 'add':
           resultMatrix = evaluate(`${JSON.stringify(mA)} + ${JSON.stringify(mB)}`);
+          break;
+        case 'subtract':
+          resultMatrix = evaluate(`${JSON.stringify(mA)} - ${JSON.stringify(mB)}`);
           break;
         case 'multiply':
           resultMatrix = evaluate(`${JSON.stringify(mA)} * ${JSON.stringify(mB)}`);
@@ -70,7 +74,7 @@ const MatrixCalculator = () => {
 
       setResult(formatMatrix(resultMatrix));
     } catch (error) {
-      toast.error("Ошибка в вычислениях. Проверьте размерности матриц");
+      toast.error("Ошибка в вычислениях");
     }
   };
 
@@ -82,105 +86,147 @@ const MatrixCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-      <Card className="w-full max-w-4xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-2">
-              <Calculator className="h-8 w-8" />
-              Матричный калькулятор
-            </h1>
-            <p className="text-sm text-gray-500">
-              Поддержка основных операций с матрицами
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="w-20">
-                  <Label>Строки</Label>
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    value={rows} 
-                    onChange={(e) => setRows(parseInt(e.target.value))}
-                  />
-                </div>
-                <div className="w-20">
-                  <Label>Столбцы</Label>
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    value={cols} 
-                    onChange={(e) => setCols(parseInt(e.target.value))}
-                  />
-                </div>
-                <Button 
-                  className="self-end"
-                  variant="outline"
-                  onClick={() => setMatrixA(generateEmptyMatrix())}
-                >
-                  Создать
-                </Button>
-              </div>
-
-              <div>
-                <Label>Матрица A</Label>
-                <Textarea
-                  value={matrixA}
-                  onChange={(e) => setMatrixA(e.target.value)}
-                  placeholder="Пример: 1 2; 3 4"
-                  className="font-mono"
-                  rows={5}
-                />
-              </div>
-
-              <div>
-                <Label>Матрица B</Label>
-                <Textarea
-                  value={matrixB}
-                  onChange={(e) => setMatrixB(e.target.value)}
-                  placeholder="Пример: 5 6; 7 8"
-                  className="font-mono"
-                  rows={5}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2">
-                <Button onClick={() => handleOperation('add')} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Сложение
-                </Button>
-                <Button onClick={() => handleOperation('multiply')} className="gap-2">
-                  <X className="h-4 w-4" />
-                  Умножение
-                </Button>
-                <Button onClick={() => handleOperation('transpose')} className="gap-2">
-                  <RotateCcw className="h-4 w-4" />
-                  Транспонирование
-                </Button>
-                <Button onClick={() => handleOperation('determinant')} className="gap-2">
-                  <Hash className="h-4 w-4" />
-                  Определитель
-                </Button>
-              </div>
-
-              <div>
-                <Label>Результат</Label>
-                <Textarea
-                  value={result}
-                  readOnly
-                  className="font-mono bg-gray-50"
-                  rows={8}
-                />
-              </div>
+    <div className="space-y-6 text-white">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Matrix A */}
+        <div className="space-y-4">
+          <div className="text-xl font-bold">Matrix A:</div>
+          <div className="bg-slate-800 p-4 rounded-lg">
+            <Textarea
+              value={matrixA}
+              onChange={(e) => setMatrixA(e.target.value)}
+              placeholder="Пример: 1 2 3; 4 5 6; 7 8 9"
+              className="font-mono bg-slate-700 border-slate-600 text-white"
+              rows={5}
+            />
+            <div className="flex gap-2 mt-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setMatrixA(generateEmptyMatrix())}
+              >
+                Cells
+              </Button>
+              <Input 
+                type="number" 
+                min="1" 
+                value={rows} 
+                onChange={(e) => setRows(parseInt(e.target.value))}
+                className="w-16 bg-slate-700 border-slate-600"
+              />
+              <Input 
+                type="number" 
+                min="1" 
+                value={cols} 
+                onChange={(e) => setCols(parseInt(e.target.value))}
+                className="w-16 bg-slate-700 border-slate-600"
+              />
             </div>
           </div>
         </div>
-      </Card>
+
+        {/* Matrix B */}
+        <div className="space-y-4">
+          <div className="text-xl font-bold">Matrix B:</div>
+          <div className="bg-slate-800 p-4 rounded-lg">
+            <Textarea
+              value={matrixB}
+              onChange={(e) => setMatrixB(e.target.value)}
+              placeholder="Пример: 9 8 7; 6 5 4; 3 2 1"
+              className="font-mono bg-slate-700 border-slate-600 text-white"
+              rows={5}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Operations */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Button 
+          onClick={() => handleOperation('multiply')} 
+          className="bg-slate-700 hover:bg-slate-600"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          A × B
+        </Button>
+        <Button 
+          onClick={() => handleOperation('add')} 
+          className="bg-slate-700 hover:bg-slate-600"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          A + B
+        </Button>
+        <Button 
+          onClick={() => handleOperation('subtract')} 
+          className="bg-slate-700 hover:bg-slate-600"
+        >
+          <X className="h-4 w-4 mr-2" />
+          A - B
+        </Button>
+        <Button 
+          onClick={() => handleOperation('transpose')} 
+          className="bg-slate-700 hover:bg-slate-600"
+        >
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Transpose
+        </Button>
+      </div>
+
+      {/* Additional Operations */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Button 
+          onClick={() => handleOperation('determinant')} 
+          className="bg-slate-700 hover:bg-slate-600"
+        >
+          <Hash className="h-4 w-4 mr-2" />
+          Determinant
+        </Button>
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={showDecimals}
+            onChange={(e) => setShowDecimals(e.target.checked)}
+            className="w-4 h-4"
+          />
+          <Label>Display decimals</Label>
+        </div>
+      </div>
+
+      {/* Result */}
+      <div className="space-y-4">
+        <div className="text-xl font-bold">Result:</div>
+        <div className="bg-slate-800 p-4 rounded-lg">
+          <Textarea
+            value={result}
+            readOnly
+            className="font-mono bg-slate-700 border-slate-600 text-white"
+            rows={5}
+          />
+          <div className="flex gap-2 mt-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setResult("")}
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Clean
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText(result);
+                toast.success("Результат скопирован");
+              }}
+              className="gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

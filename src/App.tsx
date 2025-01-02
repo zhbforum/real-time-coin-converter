@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Index from "./pages/Index";
 import Graph from "./pages/Graph";
 import Finance from "./pages/Finance";
+import Matrix from "./pages/Matrix";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/graph" element={<Graph />} />
           <Route path="/finance" element={<Finance />} />
+          <Route path="/matrix" element={<Matrix />} />
         </Routes>
       </Router>
     </QueryClientProvider>
